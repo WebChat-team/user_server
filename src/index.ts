@@ -4,8 +4,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import debag from "./middlewares/debag";
-import { POST as loginPost } from "./route/login/methods";
-import { POST as registerPost } from "./route/register/methods";
+import videoRoute from "./route/video";
+import photoRoute from "./route/photo";
+import videosRoute from "./route/videos";
+import infoRoute from "./route/info";
 
 // constants ================================================ //
 dotenv.config({ path: ".env.local" });
@@ -15,15 +17,15 @@ const { PORT, MODE, HOST } = process.env;
 (async () => {
 
     const APP = express();
-
     if (MODE === "development") APP.use(debag());
 
     APP.use(cors());
-    APP.use(express.json());
     APP.use(cookieParser());
 
-    APP.post("/login", loginPost);
-    APP.post("/register", registerPost);
+    APP.use("/video", videoRoute);
+    APP.use("/photo", photoRoute);
+    APP.use("/videos", videosRoute);
+    APP.use("/info", infoRoute);
 
     APP.listen(
         PORT,
@@ -34,5 +36,5 @@ const { PORT, MODE, HOST } = process.env;
             );
         }
     );
-    
+
 })();
