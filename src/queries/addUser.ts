@@ -13,8 +13,17 @@ export default async function addUser(email: string, password: string) {
             [email, hashed_password]
         )
     ));
-
+    
     // @ts-ignore
-    return result[0].insertId;
+    const userId = result[0].insertId;
+    
+    const resultD = await queryDataBase((connection) => (
+        connection.execute(
+            "INSERT INTO profiles (user_id, avatar_url, name) VALUES (?, ?, ?)",
+            [userId, `/imgs/default_avatar.png`, `user_${userId}`]
+        )
+    ));
+
+    return userId;
 
 }

@@ -3,19 +3,18 @@ import dotenv from "dotenv";
 
 // constants ================================================ //
 dotenv.config({ path: ".env.local" });
-const { HOST, PORT } = process.env;
 
 // main ===================================================== //
 export default async function getAuthTokens(userId: number) {
 
     const response = await fetch(
-        "http://api.vision.com:3000/auth/get_tokens.php",
+        `${process.env.API_SERVER_ADDRESS}/auth/get_tokens.php`,
         {
             method: "POST",
             credentials: "include",
             headers: {
                 "Content-Type": "Application/json",
-                "Origin": `http://${HOST}:${PORT}`
+                "Origin": `http://${process.env.SERVER_HOST}`
             },
             body: JSON.stringify({ userId })
         }
