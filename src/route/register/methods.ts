@@ -14,14 +14,18 @@ async function POST(request: Request, response: Response) {
     ) {
 
         const { email, password } = request.body;
+        console.log(email, password);
         const user = await getUserWith({ email });
+        console.log(user);
 
         if (user) {
             response.sendStatus(409);
         } else {
             const userId = await addUser(email, password);
+            console.log(userId);
             if (userId) {
                 const tokens = await getAuthTokens(userId);
+                console.log(tokens);
                 if (tokens) {
                     response
                         .setHeader("Set-Cookie", tokens)
