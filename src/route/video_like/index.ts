@@ -1,7 +1,6 @@
 // imports ================================================== //
 import { Router } from "express";
-import { GET, POST, PUT } from "./methods";
-import upload from "../../helpers/multier";
+import { DELETE, GET, POST } from "./methods";
 
 // constants ================================================ //
 const ROUTER = Router();
@@ -10,8 +9,8 @@ const ROUTER = Router();
 ROUTER
     .route("/")
         .get(GET)
-        .put(PUT)
-        .post(upload.single("video"), POST);
+        .post(POST)
+        .delete(DELETE);
 
 // exports ================================================== //
 export default ROUTER;

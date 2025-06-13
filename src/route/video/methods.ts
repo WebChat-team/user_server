@@ -110,9 +110,9 @@ async function POST(request: Request, response: Response) {
                         title,
                         description,
                         age_limit,
-                        (hasComments === "on") ? "1" : "0",
+                        hasComments === "true" ? 1 : 0,
                         levelAccess,
-                        (hasDownload === "on") ? "1" : "0",
+                        hasDownload === "true" ? 1 : 0
                     ]);
                 }
             );
@@ -126,6 +126,78 @@ async function POST(request: Request, response: Response) {
     response.status(403).json({ message: "Посмотри cookie!" });
 
 }
+async function PUT(request: Request, response: Response) {
+
+    // Проверка авторизации
+    if (!request.cookies.access_token) {
+        return response.status(403).json({ message: "Требуется авторизация" });
+    }
+
+    const userData = jwt.decode(request.cookies.access_token);
+    
+    // Проверка валидности токена
+    if (!isUserDataFromJWT(userData)) {
+        return response.status(403).json({ message: "Неверный токен" });
+    }
+
+    const { videoId, title, description, age_limit, hasComments, hasDownload, levelAccess } = request.body;
+
+    try {
+        // 1. Проверяем, принадлежит ли видео пользователю
+        const videoExists = await queryDataBase(
+            async (connection) => {
+                const [rows] = await connection.execute(
+                    "SELECT user_id FROM videos WHERE id = ?",
+                    [videoId]
+                );
+                // @ts-ignore
+                return rows.length > 0;
+            }
+        );
+
+        if (!videoExists) {
+            return response.status(404).json({ message: "Видео не найдено" });
+        }
+
+        // 2. Обновляем данные видео
+        await queryDataBase(
+            async (connection) => {
+                const prepareQuery = await connection.prepare(`
+                    UPDATE videos 
+                    SET 
+                        name = ?,
+                        description = ?,
+                        age_limit = ?,
+                        has_comments = ?,
+                        level_access = ?,
+                        has_load = ?
+                    WHERE id = ? AND user_id = ?
+                `);
+                
+                await prepareQuery.execute([
+                    title,
+                    description,
+                    age_limit,
+                    hasComments ? 1 : 0,
+                    levelAccess,
+                    hasDownload ? 1 : 0,
+                    videoId,
+                    userData.user_id
+                ]);
+
+            }
+        );
+
+        return response.json({ link: `http://vision.com:3005/watch?v=${videoId}` }).end();
+
+    } catch (error) {
+        console.error('Ошибка при обновлении видео:', error);
+        return response.status(500).json({ 
+            success: false,
+            message: "Произошла ошибка при обновлении видео"
+        });
+    }
+}
 
 // exports ================================================== //
-export { GET, POST };
+export { GET, POST, PUT };
