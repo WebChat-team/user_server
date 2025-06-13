@@ -20,6 +20,8 @@ export default async function getAuthTokens(userId: number) {
         }
     );  
 
+    console.log(response.status);
+
     return response.headers.getSetCookie();
 
 }
