@@ -9,7 +9,7 @@ export default async function addUser(email: string, password: string) {
 
     const result = await queryDataBase((connection) => (
         connection.execute(
-            "INSERT INTO users (email, password) VALUES (?, ?)",
+            "INSERT INTO users (email, hashed_password) VALUES (?, ?)",
             [email, hashed_password]
         )
     ));
