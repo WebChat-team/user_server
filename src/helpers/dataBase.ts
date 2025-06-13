@@ -1,22 +1,29 @@
 // imports ================================================== //
 import mysql from "mysql2";
-import type { Connection } from "mysql2/promise";
+import type { Pool, PoolConnection } from "mysql2/promise";
 import dotenv from "dotenv";
 
 // constants ================================================ //
 dotenv.config({ path: ".env.local" });
-const { DATABASE_HOST, DATABASE_NAME, DATABASE_PASSWORD, DATABASE_USERNAME } = process.env;
+const { DATABASE_HOST, DATABASE_PORT, DATABASE_NAME, DATABASE_PASSWORD, DATABASE_USERNAME } = process.env;
 
 // main ===================================================== //
-let dataBase: Connection | undefined;
+let pool: Pool | undefined;
 
 try {
 
-    dataBase = mysql.createConnection({
+    pool = mysql.createPool({
+
         host: DATABASE_HOST,
+        port: Number(DATABASE_PORT),
         database: DATABASE_NAME,
         user: DATABASE_USERNAME,
         password: DATABASE_PASSWORD,
+
+        waitForConnections: true, 
+        connectionLimit: 4,
+        queueLimit: 0,
+
     }).promise();
 
 } catch (error) {
@@ -26,5 +33,19 @@ try {
     );
 }
 
+async function queryDataBase<T extends any>(query: (connection: PoolConnection) => T ): Promise<T | undefined> {
+
+    if (!pool) return;
+
+    const connection = await pool.getConnection();
+
+    try {
+        return await query(connection);
+    } finally {
+        connection.release();
+    }
+
+}
+
 // exports ================================================== //
-export default dataBase;
+export { pool, queryDataBase };

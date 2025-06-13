@@ -2,7 +2,7 @@
 interface User {
     id: number,
     name: string,
-    password: string,
+    hashed_password: string,
     email: string,
 }
 

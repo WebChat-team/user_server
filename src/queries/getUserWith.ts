@@ -1,11 +1,11 @@
 // imports ================================================== //
-import dataBase from "../helpers/dataBase";
+import { queryDataBase } from "../helpers/dataBase";
 import type { User } from "../types/user";
 
 // main ===================================================== //
 export default async function getUserWith(paramaters: Record<string, string>): Promise<User | null> {
 
-    if (dataBase && Object.keys(paramaters).length) {
+    if (Object.keys(paramaters).length) {
 
         let values = [];
         let whereValue = "";
@@ -18,10 +18,12 @@ export default async function getUserWith(paramaters: Record<string, string>): P
             }
         }
 
-        const [results, fields] = await dataBase.query(`SELECT * FROM users WHERE ${whereValue}`, values);
+        const results = await queryDataBase((connection) => (
+            connection.query(`SELECT * FROM users WHERE ${whereValue}`, values)
+        ));
 
         // @ts-ignore: resulst 
-        if (results[0]) return results[0];
+        if (results[0]) return results[0][0];
 
     }
 

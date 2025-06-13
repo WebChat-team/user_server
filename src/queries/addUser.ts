@@ -1,24 +1,20 @@
 // imports ================================================== //
-import dataBase from "../helpers/dataBase";
+import { queryDataBase } from "../helpers/dataBase";
 import { hash } from "bcrypt";
 
 // main ===================================================== //
 export default async function addUser(email: string, password: string) {
 
-    if (dataBase) {
+    const hashed_password = await hash(password, 10);
 
-        const hashed_password = await hash(password, 10);
-
-        const [result] = await dataBase.execute(
+    const result = await queryDataBase((connection) => (
+        connection.execute(
             "INSERT INTO users (email, password) VALUES (?, ?)",
             [email, hashed_password]
-        );
+        )
+    ));
 
-        // @ts-ignore
-        return result.insertId;
-
-    }
-
-    return null;
+    // @ts-ignore
+    return result[0].insertId;
 
 }

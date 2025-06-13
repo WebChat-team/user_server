@@ -1,7 +1,6 @@
 // imports ================================================== //
 import type { Response, Request } from "express";
 import getUserWith from "../../queries/getUserWith";
-import addUser from "../../queries/addUser";
 import getAuthTokens from "../../helpers/getAuthTokens";
 import bcrypt from "bcrypt";
 
@@ -18,7 +17,8 @@ async function POST(request: Request, response: Response) {
         const user = await getUserWith({ email });
 
         if (user) {
-            if (await bcrypt.compare(password, user.password)) {
+            // @ts-ignore
+            if (await bcrypt.compare(password, user.hashed_password)) {
                 const tokens = await getAuthTokens(user.id);
                 if (tokens) {
                     response

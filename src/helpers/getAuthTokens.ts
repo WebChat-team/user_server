@@ -9,7 +9,7 @@ const { HOST, PORT } = process.env;
 export default async function getAuthTokens(userId: number) {
 
     const response = await fetch(
-        "http://api.webchat.com:3000/auth/get_tokens.php",
+        "http://api.vision.com:3000/auth/get_tokens.php",
         {
             method: "POST",
             credentials: "include",
