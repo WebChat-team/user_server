@@ -7,6 +7,8 @@ import getAuthTokens from "../../helpers/getAuthTokens";
 // main ===================================================== //
 async function POST(request: Request, response: Response) {
 
+    console.log("sdfsfsdsf");
+
     if (
         request.body &&
         request.body.email &&
